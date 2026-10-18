@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="VoixDuQuartier.Views.FeedPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:VoixDuQuartier.Controls"
+    xmlns:vm="clr-namespace:VoixDuQuartier.ViewModels"
+    Title="Accueil">
+
+    <!-- 04 · Fil des signalements (cartes, filtres par catégorie et statut) -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12" Padding="24,0,24,0">
+
+        <Label Grid.Row="0" Text="Signalements" Style="{StaticResource Title}" Margin="0,24,0,0" />
+
+        <!-- Filtres par catégorie -->
+        <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding CategoryChips}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <controls:ChipView
+                            Text="{Binding Label}"
+                            IsSelected="{Binding IsSelected}"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FeedViewModel}}, Path=SelectCategoryCommand}"
+                            CommandParameter="{Binding .}" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <!-- Filtres par statut -->
+        <ScrollView Grid.Row="2" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding StatusChips}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <controls:ChipView
+                            Text="{Binding Label}"
+                            IsSelected="{Binding IsSelected}"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FeedViewModel}}, Path=SelectStatusCommand}"
+                            CommandParameter="{Binding .}" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="3">
+            <!-- Liste -->
+            <CollectionView ItemsSource="{Binding Reports}" SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.Footer>
+                    <BoxView HeightRequest="12" Color="Transparent" />
+                </CollectionView.Footer>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource Card}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FeedViewModel}}, Path=OpenDetailCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="64,*" ColumnSpacing="12">
+                                <Border Style="{StaticResource Thumb}" WidthRequest="64" HeightRequest="64">
+                                    <Grid>
+                                        <Image Source="{Binding PhotoPath}" Aspect="AspectFill" IsVisible="{Binding HasPhoto}" />
+                                        <Label Text="🖼" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"
+                                               IsVisible="{Binding HasNoPhoto}" />
+                                    </Grid>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{Binding Title}" FontFamily="InterBold" LineBreakMode="TailTruncation" />
+                                    <Label Text="{Binding Subtitle}" Style="{StaticResource Muted}" LineBreakMode="TailTruncation" />
+                                    <HorizontalStackLayout Spacing="8">
+                                        <controls:StatusPill Status="{Binding Status}" />
+                                        <Label Text="{Binding SupportText}" Style="{StaticResource Muted}" FontSize="12" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- État « chargement » -->
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsLoading}" VerticalOptions="Start">
+                <Border Style="{StaticResource Thumb}" HeightRequest="90" />
+                <Border Style="{StaticResource Thumb}" HeightRequest="90" />
+                <Border Style="{StaticResource Thumb}" HeightRequest="90" />
+                <Label Text="Chargement…" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- État « vide » -->
+            <VerticalStackLayout IsVisible="{Binding IsEmpty}" VerticalOptions="Center" Spacing="6">
+                <Label Text="Aucun signalement" Style="{StaticResource Subtitle}" HorizontalTextAlignment="Center" />
+                <Label Text="Aucun résultat pour ces filtres." Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

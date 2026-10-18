@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="VoixDuQuartier.Views.NewReportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:VoixDuQuartier.Controls"
+    xmlns:vm="clr-namespace:VoixDuQuartier.ViewModels"
+    Title="+">
+
+    <!-- 05 · Nouveau signalement (photo, catégorie, position, description) -->
+    <ScrollView>
+        <VerticalStackLayout Padding="24,24,24,24" Spacing="14">
+            <Label Text="Nouveau signalement" Style="{StaticResource Title}" FontSize="22" />
+
+            <!-- Photo -->
+            <Border Style="{StaticResource Card}" StrokeDashArray="4,3" HeightRequest="160" Padding="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ChoosePhotoCommand}" />
+                </Border.GestureRecognizers>
+                <Grid>
+                    <Image Source="{Binding PhotoPath}" Aspect="AspectFill" IsVisible="{Binding HasPhoto}" />
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="6" IsVisible="{Binding HasNoPhoto}">
+                        <Label Text="📷" FontSize="32" HorizontalTextAlignment="Center" />
+                        <Label Text="Ajouter une photo" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+            <Label Text="Retirer la photo" Style="{StaticResource LinkLabel}" HorizontalOptions="End"
+                   IsVisible="{Binding HasPhoto}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding RemovePhotoCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <!-- Catégorie -->
+            <Label Text="Catégorie" Style="{StaticResource FieldLabel}" />
+            <FlexLayout Wrap="Wrap" BindableLayout.ItemsSource="{Binding CategoryChips}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <controls:ChipView
+                            Margin="0,0,8,8"
+                            Text="{Binding Label}"
+                            IsSelected="{Binding IsSelected}"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NewReportViewModel}}, Path=SelectCategoryCommand}"
+                            CommandParameter="{Binding .}" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+
+            <!-- Position -->
+            <Label Text="Position" Style="{StaticResource FieldLabel}" />
+            <Border Style="{StaticResource FieldBorder}">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                    <Label Text="📍" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding LocationText}" VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                    <Label Grid.Column="2" Text="Modifier" Style="{StaticResource LinkLabel}" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding UseMyLocationCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+            </Border>
+
+            <!-- Description -->
+            <Label Text="Description" Style="{StaticResource FieldLabel}" />
+            <Border Style="{StaticResource Card}" HeightRequest="110">
+                <Border.Triggers>
+                    <DataTrigger
+                        TargetType="Border"
+                        Binding="{Binding DescriptionError, Converter={StaticResource NotEmpty}}"
+                        Value="True">
+                        <Setter Property="Stroke" Value="{StaticResource RedBrush}" />
+                    </DataTrigger>
+                </Border.Triggers>
+                <Editor
+                    Placeholder="Décrivez votre problème…"
+                    MaxLength="300"
+                    Text="{Binding Description, Mode=TwoWay}" />
+            </Border>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,-8,0,0">
+                <Label Text="{Binding DescriptionError}" Style="{StaticResource ErrorLabel}"
+                       IsVisible="{Binding DescriptionError, Converter={StaticResource NotEmpty}}" />
+                <Label Grid.Column="1" Text="{Binding DescriptionCounter}" Style="{StaticResource Muted}" FontSize="12" />
+            </Grid>
+
+            <!-- Bouton : désactivé tant que la description est invalide ou pendant l'envoi -->
+            <Button Text="Envoyer le signalement" Style="{StaticResource PrimaryButton}"
+                    Command="{Binding SendCommand}" Margin="0,8,0,0" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
