@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="VoixDuQuartier.Views.ConfirmationPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:VoixDuQuartier.Controls"
+    Shell.TabBarIsVisible="False">
+
+    <!-- 06 · Confirmation d'envoi -->
+    <Grid RowDefinitions="*,Auto" Padding="24">
+        <VerticalStackLayout VerticalOptions="Center" Spacing="16">
+            <Border WidthRequest="120" HeightRequest="120" BackgroundColor="{StaticResource Green}"
+                    StrokeThickness="0" HorizontalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="60" />
+                </Border.StrokeShape>
+                <Label Text="✔" FontSize="56" TextColor="{StaticResource OnGreen}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <Label Text="Signalement envoyé" Style="{StaticResource Title}" FontSize="28"
+                   HorizontalTextAlignment="Center" Margin="0,8,0,0" />
+            <Label Text="Merci ! Votre signalement a été transmis. Vos voisins peuvent maintenant le soutenir."
+                   Style="{StaticResource Muted}" FontSize="15" HorizontalTextAlignment="Center" />
+
+            <!-- Rappel du signalement envoyé -->
+            <Border Style="{StaticResource Card}" Margin="0,16,0,0" IsVisible="{Binding Report, Converter={StaticResource NotNull}}">
+                <Grid ColumnDefinitions="48,*" ColumnSpacing="12">
+                    <Border Style="{StaticResource Thumb}" WidthRequest="48" HeightRequest="48">
+                        <Grid>
+                            <Image Source="{Binding Report.PhotoPath}" Aspect="AspectFill" IsVisible="{Binding Report.HasPhoto}" />
+                            <Label Text="🖼" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding Report.HasNoPhoto}" />
+                        </Grid>
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                        <Label Text="{Binding Report.Title}" FontFamily="InterBold" LineBreakMode="TailTruncation" />
+                        <controls:StatusPill Status="{Binding Report.Status}" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="12">
+            <Button Text="Voir mon signalement" Style="{StaticResource PrimaryButton}" Command="{Binding ViewReportCommand}" />
+            <Button Text="Retour au fil" Style="{StaticResource GhostButton}" Command="{Binding BackToFeedCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>
