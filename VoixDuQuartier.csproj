@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- ============================================================
+	     VERSION DE .NET : voir le README (étape 1) pour afficher votre version.
+	       10.x : net10.0   |   9.x : net9.0   |   8.x : net8.0
+	     Si votre version n'est pas net10.0, changez UNIQUEMENT la ligne ci-dessous.
+	     ============================================================ -->
+	<PropertyGroup>
+		<DotNetTfm>net10.0</DotNetTfm>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- Android partout ; Windows sur un PC Windows ; iOS sur un Mac -->
+		<TargetFrameworks>$(DotNetTfm)-android</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);$(DotNetTfm)-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);$(DotNetTfm)-ios</TargetFrameworks>
+
+		<OutputType>Exe</OutputType>
+		<RootNamespace>VoixDuQuartier</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Identité de l'application -->
+		<ApplicationTitle>VoixDuQuartier</ApplicationTitle>
+		<ApplicationId>com.voixduquartier.app</ApplicationId>
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+	</PropertyGroup>
+
+	<!-- Windows : application « non empaquetée » (se lance directement, sans certificat MSIX) -->
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<WindowsPackageType>None</WindowsPackageType>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<SelfContained>true</SelfContained>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Icône et écran de démarrage système : formes vectorielles très légères (écoconception) -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#121212" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#121212" BaseSize="128,128" />
+
+		<!-- Une seule famille de polices : Inter (comme dans les maquettes Figma) -->
+		<MauiFont Include="Resources\Fonts\*" />
+
+		<!-- Images des signalements (nid_de_poule, lampadaire, ordures, cable) -->
+		<MauiImage Include="Resources\Images\*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	</ItemGroup>
+
+	<!-- Les tests unitaires vivent dans le dossier tests/ : ils ne font pas partie de l'application -->
+	<ItemGroup>
+		<Compile Remove="tests\**" />
+		<EmbeddedResource Remove="tests\**" />
+		<None Remove="tests\**" />
+	</ItemGroup>
+
+</Project>

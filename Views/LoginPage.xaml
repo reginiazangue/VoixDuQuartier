@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="VoixDuQuartier.Views.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:VoixDuQuartier.Controls"
+    Shell.TabBarIsVisible="False">
+
+    <!-- 02 · Connexion -->
+    <ScrollView>
+        <VerticalStackLayout Padding="24,60,24,24" Spacing="16">
+            <controls:AppLogo />
+            <Label Text="Connexion" Style="{StaticResource Title}" HorizontalTextAlignment="Center" Margin="0,0,0,12" />
+
+            <controls:FormField
+                Label="E-mail"
+                Placeholder="votreemail@gmail.com"
+                Keyboard="Email"
+                Text="{Binding Email, Mode=TwoWay}"
+                Error="{Binding EmailError}" />
+
+            <controls:FormField
+                Label="Mot de passe"
+                Placeholder="••••••••"
+                IsPassword="True"
+                Text="{Binding Password, Mode=TwoWay}"
+                Error="{Binding PasswordError}" />
+
+            <Label Text="Mot de passe oublié ?" Style="{StaticResource LinkLabel}" HorizontalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Button
+                Text="Se connecter"
+                Style="{StaticResource PrimaryButton}"
+                Command="{Binding LoginCommand}"
+                IsEnabled="{Binding IsNotBusy}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6" Margin="0,24,0,0">
+                <Label Text="Pas de compte ?" Style="{StaticResource Muted}" />
+                <Label Text="Créer un compte" Style="{StaticResource LinkLabel}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToRegisterCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

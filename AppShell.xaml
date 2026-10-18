@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="VoixDuQuartier.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:VoixDuQuartier.Views"
+    FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
+    Shell.BackgroundColor="{AppThemeBinding Light={StaticResource LightBg}, Dark={StaticResource DarkBg}}"
+    Shell.TabBarBackgroundColor="{AppThemeBinding Light={StaticResource LightSurface}, Dark={StaticResource DarkSurface}}"
+    Shell.TabBarForegroundColor="{StaticResource Green}"
+    Shell.TabBarTitleColor="{StaticResource Green}"
+    Shell.TabBarUnselectedColor="{AppThemeBinding Light={StaticResource LightMuted}, Dark={StaticResource DarkMuted}}">
+
+    <!-- Parcours d'entrée : 01 Démarrage, 02 Connexion, 03 Inscription -->
+    <ShellContent Route="splash" ContentTemplate="{DataTemplate views:SplashPage}" />
+    <ShellContent Route="login" ContentTemplate="{DataTemplate views:LoginPage}" />
+    <ShellContent Route="register" ContentTemplate="{DataTemplate views:RegisterPage}" />
+
+    <!-- Barre de navigation du bas : Accueil, Carte, +, Alertes, Profil -->
+    <TabBar Route="main">
+        <ShellContent Route="feed" Title="Accueil" ContentTemplate="{DataTemplate views:FeedPage}" />
+        <ShellContent Route="map" Title="Carte" ContentTemplate="{DataTemplate views:MapPage}" />
+        <ShellContent Route="new" Title="+" ContentTemplate="{DataTemplate views:NewReportPage}" />
+        <ShellContent Route="notifications" Title="Alertes" ContentTemplate="{DataTemplate views:NotificationsPage}" />
+        <ShellContent Route="profile" Title="Profil" ContentTemplate="{DataTemplate views:ProfilePage}" />
+    </TabBar>
+</Shell>

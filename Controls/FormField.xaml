@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="VoixDuQuartier.Controls.FormField"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <VerticalStackLayout Spacing="6">
+        <Label Text="{Binding Label, Source={x:Reference Root}}" Style="{StaticResource FieldLabel}" />
+
+        <!-- État erreur : contour rouge dès qu'un message d'erreur est présent -->
+        <Border Style="{StaticResource FieldBorder}">
+            <Border.Triggers>
+                <DataTrigger
+                    TargetType="Border"
+                    Binding="{Binding Error, Source={x:Reference Root}, Converter={StaticResource NotEmpty}}"
+                    Value="True">
+                    <Setter Property="Stroke" Value="{StaticResource RedBrush}" />
+                </DataTrigger>
+            </Border.Triggers>
+
+            <Entry
+                Text="{Binding Text, Source={x:Reference Root}, Mode=TwoWay}"
+                Placeholder="{Binding Placeholder, Source={x:Reference Root}}"
+                IsPassword="{Binding IsPassword, Source={x:Reference Root}}"
+                Keyboard="{Binding Keyboard, Source={x:Reference Root}}"
+                VerticalOptions="Center" />
+        </Border>
+
+        <Label
+            Text="{Binding Error, Source={x:Reference Root}}"
+            IsVisible="{Binding Error, Source={x:Reference Root}, Converter={StaticResource NotEmpty}}"
+            Style="{StaticResource ErrorLabel}" />
+    </VerticalStackLayout>
+</ContentView>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="456" height="456" viewBox="0 0 456 456" version="1.1">
+    <circle cx="228" cy="228" r="104" fill="none" stroke="#2E9E6B" stroke-width="22" />
+    <polygon points="140,300 112,364 178,334" fill="#2E9E6B" />
+    <g transform="translate(168 168) scale(5)">
+        <path fill="#2E9E6B" fill-rule="evenodd"
+              d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
+    </g>
+</svg>

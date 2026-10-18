@@ -1,0 +1,17 @@
+## Build
+bin/
+obj/
+artifacts/
+
+## IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+## Fichiers générés / secrets (ne jamais envoyer sur GitHub)
+*.keystore
+*.jks
+*.pfx
+appsettings.Local.json
+.env

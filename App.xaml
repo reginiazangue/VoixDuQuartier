@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application
+    x:Class="VoixDuQuartier.App"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:conv="clr-namespace:VoixDuQuartier.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <conv:StringNotEmptyConverter x:Key="NotEmpty" />
+            <conv:NotNullConverter x:Key="NotNull" />
+            <conv:InverseBoolConverter x:Key="InverseBool" />
+            <conv:CategoryColorConverter x:Key="CategoryColor" />
+            <conv:ReachedFillConverter x:Key="ReachedFill" />
+            <conv:BoolToOpacityConverter x:Key="ReachedOpacity" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="VoixDuQuartier.Controls.AppLogo"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls">
+
+    <!-- Logo : bulle verte avec un repère de carte, dessiné en vectoriel (aucune image à charger) -->
+    <Grid WidthRequest="76" HeightRequest="76" HorizontalOptions="Center">
+        <shapes:Ellipse
+            WidthRequest="62" HeightRequest="62"
+            Stroke="{StaticResource GreenBrush}" StrokeThickness="5"
+            HorizontalOptions="Center" VerticalOptions="Center" />
+
+        <!-- Petite pointe de la bulle -->
+        <shapes:Polygon
+            Points="0,0 15,6 4,16"
+            Fill="{StaticResource GreenBrush}"
+            HorizontalOptions="Start" VerticalOptions="End"
+            Margin="8,0,0,2" />
+
+        <!-- Repère de carte (le trou central est obtenu par la règle de remplissage EvenOdd) -->
+        <shapes:Path
+            Fill="{StaticResource GreenBrush}"
+            Aspect="Uniform"
+            WidthRequest="22" HeightRequest="30"
+            HorizontalOptions="Center" VerticalOptions="Center"
+            Data="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
+    </Grid>
+</ContentView>
