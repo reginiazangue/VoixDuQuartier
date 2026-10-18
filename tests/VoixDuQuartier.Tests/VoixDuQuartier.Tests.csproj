@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Tests unitaires de la logique « pure » (sans MAUI) : validation des formulaires et génération du titre.
+	     RollForward=Major : les tests s'exécutent avec le .NET installé (8, 9 ou 10). -->
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<RollForward>Major</RollForward>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+		<PackageReference Include="xunit" Version="2.9.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+	</ItemGroup>
+
+	<!-- On compile directement les fichiers testés (ils ne dépendent pas de MAUI) -->
+	<ItemGroup>
+		<Compile Include="..\..\Helpers\Validators.cs" Link="Helpers\Validators.cs" />
+		<Compile Include="..\..\Helpers\TitleBuilder.cs" Link="Helpers\TitleBuilder.cs" />
+	</ItemGroup>
+
+</Project>
