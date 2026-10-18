@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="VoixDuQuartier.Views.ProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:VoixDuQuartier.Controls"
+    xmlns:vm="clr-namespace:VoixDuQuartier.ViewModels"
+    Title="Profil">
+
+    <!-- 10 · Profil et paramètres -->
+    <ScrollView>
+        <VerticalStackLayout Padding="24,24,24,24" Spacing="14">
+            <Label Text="Profil" Style="{StaticResource Title}" />
+
+            <!-- Identité -->
+            <HorizontalStackLayout Spacing="14">
+                <Border WidthRequest="56" HeightRequest="56" BackgroundColor="{StaticResource Green}" StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="28" />
+                    </Border.StrokeShape>
+                    <Label Text="{Binding Initial}" FontSize="24" FontFamily="InterBold" TextColor="{StaticResource OnGreen}"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                    <Label Text="{Binding FullName}" Style="{StaticResource Subtitle}" />
+                    <Label Text="{Binding Neighborhood}" Style="{StaticResource Muted}" />
+                </VerticalStackLayout>
+            </HorizontalStackLayout>
+
+            <!-- Statistiques -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding ReportCount}" Style="{StaticResource Subtitle}" HorizontalTextAlignment="Center" />
+                        <Label Text="Signalements" Style="{StaticResource Muted}" FontSize="11" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" Style="{StaticResource Card}">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding SupportCount}" Style="{StaticResource Subtitle}" HorizontalTextAlignment="Center" />
+                        <Label Text="Soutiens" Style="{StaticResource Muted}" FontSize="11" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="2" Style="{StaticResource Card}">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding ResolvedCount}" Style="{StaticResource Subtitle}" HorizontalTextAlignment="Center" />
+                        <Label Text="Résolus" Style="{StaticResource Muted}" FontSize="11" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Mes signalements -->
+            <Label Text="Mes signalements" Style="{StaticResource FieldLabel}" FontSize="16" Margin="0,6,0,0" />
+            <HorizontalStackLayout Spacing="8">
+                <controls:ChipView Text="En cours" IsSelected="{Binding ShowInProgress}"
+                                   Command="{Binding SelectTabCommand}" CommandParameter="progress" />
+                <controls:ChipView Text="Résolus" IsSelected="{Binding ShowResolved}"
+                                   Command="{Binding SelectTabCommand}" CommandParameter="resolved" />
+            </HorizontalStackLayout>
+
+            <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding MyReports}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource Card}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProfileViewModel}}, Path=OpenDetailCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="{Binding Title}" FontFamily="InterBold" FontSize="14" LineBreakMode="TailTruncation" />
+                                    <Label Text="{Binding Subtitle}" Style="{StaticResource Muted}" FontSize="12" />
+                                </VerticalStackLayout>
+                                <controls:StatusPill Grid.Column="1" Status="{Binding Status}" VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+            <Label Text="Aucun signalement dans cette catégorie." Style="{StaticResource Muted}" HorizontalTextAlignment="Center"
+                   IsVisible="{Binding IsMyReportsEmpty}" />
+
+            <!-- Paramètres -->
+            <Label Text="Paramètres" Style="{StaticResource FieldLabel}" FontSize="16" Margin="0,8,0,0" />
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="Mode sombre" FontFamily="InterBold" FontSize="14" />
+                            <Label Text="Économise la batterie sur les écrans OLED" Style="{StaticResource Muted}" FontSize="12" />
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1" IsToggled="{Binding DarkMode, Mode=TwoWay}" VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="Notifications" FontFamily="InterBold" FontSize="14" />
+                            <Label Text="Alertes sur l'évolution de vos signalements" Style="{StaticResource Muted}" FontSize="12" />
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1" IsToggled="{Binding NotificationsEnabled, Mode=TwoWay}" VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,120">
+                        <Label Text="Langue" FontFamily="InterBold" FontSize="14" VerticalOptions="Center" />
+                        <Picker Grid.Column="1" ItemsSource="{Binding Languages}"
+                                SelectedItem="{Binding Language, Mode=TwoWay}" HorizontalTextAlignment="End" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Button Text="Se déconnecter" Style="{StaticResource DangerButton}"
+                    Command="{Binding LogoutCommand}" Margin="0,8,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
