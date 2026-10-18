@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="VoixDuQuartier.Views.MapPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:VoixDuQuartier.Controls"
+    xmlns:vm="clr-namespace:VoixDuQuartier.ViewModels"
+    Title="Carte">
+
+    <!-- 08 · Carte du quartier (épingles par catégorie) -->
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12" Padding="24,0">
+        <Label Text="Carte du quartier" Style="{StaticResource Title}" Margin="0,24,0,0" />
+
+        <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding CategoryChips}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <controls:ChipView
+                            Text="{Binding Label}"
+                            IsSelected="{Binding IsSelected}"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=SelectCategoryCommand}"
+                            CommandParameter="{Binding .}" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <!-- Fond de carte simplifié : le vrai plan (Microsoft.Maui.Controls.Maps) viendra avec le backend -->
+        <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+            <AbsoluteLayout BindableLayout.ItemsSource="{Binding Pins}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border AbsoluteLayout.LayoutBounds="{Binding PinBounds}"
+                                AbsoluteLayout.LayoutFlags="PositionProportional"
+                                WidthRequest="30" HeightRequest="30" StrokeThickness="2"
+                                Stroke="White"
+                                BackgroundColor="{Binding Category, Converter={StaticResource CategoryColor}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="15" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=OpenDetailCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="📍" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </AbsoluteLayout>
+        </Border>
+
+        <!-- Légende -->
+        <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,0,0,12">
+            <HorizontalStackLayout Spacing="14" HorizontalOptions="Center">
+                <HorizontalStackLayout Spacing="5">
+                    <BoxView WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#2E9E6B" VerticalOptions="Center" />
+                    <Label Text="Voirie" FontSize="12" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="5">
+                    <BoxView WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#F2A93B" VerticalOptions="Center" />
+                    <Label Text="Éclairage" FontSize="12" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="5">
+                    <BoxView WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#8A8A8A" VerticalOptions="Center" />
+                    <Label Text="Déchets" FontSize="12" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="5">
+                    <BoxView WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E5484D" VerticalOptions="Center" />
+                    <Label Text="Autre" FontSize="12" />
+                </HorizontalStackLayout>
+            </HorizontalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

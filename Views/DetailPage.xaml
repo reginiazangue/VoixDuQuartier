@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="VoixDuQuartier.Views.DetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:VoixDuQuartier.Controls"
+    Shell.TabBarIsVisible="False">
+
+    <!-- 07 · Détail du signalement (soutien, frise du statut, mini-carte) -->
+    <Grid RowDefinitions="Auto,*">
+        <!-- En-tête -->
+        <HorizontalStackLayout Padding="24,20,24,8" Spacing="16">
+            <Label Text="←" FontSize="24" VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BackCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Text="Détail" Style="{StaticResource Subtitle}" VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <ScrollView Grid.Row="1" IsVisible="{Binding Report, Converter={StaticResource NotNull}}">
+            <VerticalStackLayout Padding="24,8,24,24" Spacing="12">
+
+                <Border Style="{StaticResource Thumb}" HeightRequest="200">
+                    <Grid>
+                        <Image Source="{Binding Report.PhotoPath}" Aspect="AspectFill" IsVisible="{Binding Report.HasPhoto}" />
+                        <Label Text="🖼" FontSize="44" HorizontalOptions="Center" VerticalOptions="Center"
+                               IsVisible="{Binding Report.HasNoPhoto}" />
+                    </Grid>
+                </Border>
+
+                <HorizontalStackLayout Spacing="10">
+                    <controls:StatusPill Status="{Binding Report.Status}" />
+                    <Label Text="{Binding Report.Category}" Style="{StaticResource Muted}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <Label Text="{Binding Report.Title}" Style="{StaticResource Subtitle}" FontSize="20" />
+                <Label Text="{Binding Report.Description}" Style="{StaticResource Muted}" FontSize="14" LineHeight="1.3" />
+
+                <!-- Soutien : bouton plein = normal ; contour vert = soutenu -->
+                <Button Text="{Binding Report.SupportButtonText}" Command="{Binding ToggleSupportCommand}"
+                        Style="{StaticResource PrimaryButton}" Margin="0,4,0,4">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding Report.IsSupported}" Value="True">
+                            <Setter Property="BackgroundColor" Value="Transparent" />
+                            <Setter Property="TextColor" Value="{StaticResource Green}" />
+                            <Setter Property="BorderColor" Value="{StaticResource Green}" />
+                            <Setter Property="BorderWidth" Value="1.5" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!-- Frise du statut : 4 segments de largeur égale (Envoyé → Pris en charge → En cours → Résolu).
+                     Un FlexLayout répartit les étapes côte à côte ; une Grid les aurait empilées au même endroit. -->
+                <Label Text="Suivi du statut" Style="{StaticResource FieldLabel}" FontSize="16" Margin="0,8,0,0" />
+                <FlexLayout Direction="Row" BindableLayout.ItemsSource="{Binding Steps}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout FlexLayout.Basis="25%" FlexLayout.Grow="1" Spacing="6" Padding="2,0">
+                                <BoxView HeightRequest="4" CornerRadius="2"
+                                         Color="{Binding Reached, Converter={StaticResource ReachedFill}}" />
+                                <Label Text="{Binding Label}" FontSize="11" HorizontalTextAlignment="Center"
+                                       Opacity="{Binding Reached, Converter={StaticResource ReachedOpacity}}" />
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+
+                <!-- Mini-carte -->
+                <Label Text="Localisation" Style="{StaticResource FieldLabel}" FontSize="16" Margin="0,8,0,0" />
+                <Border Style="{StaticResource Card}" HeightRequest="110" Padding="0">
+                    <Grid>
+                        <Label Text="📍" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center" />
+                        <Label Text="{Binding Report.Location}" Style="{StaticResource Muted}" FontSize="12"
+                               HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,8" />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
