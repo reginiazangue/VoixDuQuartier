@@ -19,8 +19,9 @@ public static class MauiProgram
             });
 
         // Services (uniques pour toute l'application)
-        builder.Services.AddSingleton<ISessionService, SessionService>();
-        builder.Services.AddSingleton<IDataService, InMemoryDataService>();
+        builder.Services.AddSingleton<ISessionService, ApiSessionService>();
+        builder.Services.AddSingleton<IDataService, ApiDataService>();
+        builder.Services.AddSingleton<ApiService>();
 
         // ViewModels
         builder.Services.AddTransient<LoginViewModel>();

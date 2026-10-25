@@ -49,6 +49,18 @@ public partial class RegisterViewModel : BaseViewModel
             Password = ConfirmPassword = string.Empty;
             await Shell.Current.GoToAsync("//main/feed");
         }
+        catch (ApiException ex)
+        {
+            if (ex.StatusCode == 409)
+            {
+                // E-mail déjà utilisé
+                EmailError = ex.Message;
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Inscription impossible", ex.Message, "OK");
+            }
+        }
         finally
         {
             IsBusy = false;

@@ -36,6 +36,11 @@ public partial class LoginViewModel : BaseViewModel
             Password = string.Empty;
             await Shell.Current.GoToAsync("//main/feed");
         }
+        catch (ApiException ex)
+        {
+            // Serveur injoignable ou autre problème : on affiche le message sous le mot de passe.
+            PasswordError = ex.Message;
+        }
         finally
         {
             IsBusy = false;
@@ -49,6 +54,6 @@ public partial class LoginViewModel : BaseViewModel
     private Task ForgotPasswordAsync() =>
         Shell.Current.DisplayAlert(
             "Mot de passe oublié",
-            "La récupération par e-mail sera disponible avec le backend.",
+            "La récupération par e-mail sera disponible dans une prochaine version.",
             "OK");
 }
