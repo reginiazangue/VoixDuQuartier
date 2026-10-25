@@ -24,6 +24,7 @@ public class ApiDataService : IDataService
     private readonly ApiService _api;
     private readonly Dictionary<string, Report> _cache = new();
     private bool _connectionAlertShown;
+    private ApiProfile? _profile; // dernier profil reçu du serveur
 
     public ApiDataService(ApiService api)
     {
@@ -36,11 +37,7 @@ public class ApiDataService : IDataService
     {
         try
         {
-            var page = await CallAsync(() => _api.GetReportsAsync());
-
-            // Le détail contient tout ce dont l'application a besoin (description, adresse, position, soutien).
-            var details = await Task.WhenAll(page.Items.Select(i => _api.GetReportAsync(i.Id)));
-            var reports = details.Select(ToReport).ToList();
+            var reports = await LoadReportsAsync(mine: false);
 
             _cache.Clear();
             foreach (var report in reports)
@@ -55,6 +52,37 @@ public class ApiDataService : IDataService
             await HandleReadErrorAsync(ex);
             return _cache.Values.ToList();
         }
+    }
+
+    /// <summary>Les signalements de l'utilisateur connecté (écran Profil).</summary>
+    public async Task<IReadOnlyList<Report>> GetMyReportsAsync()
+    {
+        try
+        {
+            var reports = await LoadReportsAsync(mine: true);
+
+            // On les garde en mémoire pour que l'écran Détail les retrouve.
+            foreach (var report in reports)
+            {
+                _cache[report.Id] = report;
+            }
+
+            return reports;
+        }
+        catch (ApiException ex)
+        {
+            await HandleReadErrorAsync(ex);
+            return _cache.Values.Where(r => r.IsMine).ToList();
+        }
+    }
+
+    private async Task<List<Report>> LoadReportsAsync(bool mine)
+    {
+        var page = await CallAsync(() => _api.GetReportsAsync(mine: mine));
+
+        // Le détail contient tout ce dont l'application a besoin (description, adresse, position, soutien).
+        var details = await Task.WhenAll(page.Items.Select(i => _api.GetReportAsync(i.Id)));
+        return details.Select(ToReport).ToList();
     }
 
     public Report? GetReport(string id) =>
@@ -122,6 +150,77 @@ public class ApiDataService : IDataService
         {
             await HandleReadErrorAsync(ex);
             return Array.Empty<AppNotification>();
+        }
+    }
+
+    /// <summary>Bouton « Soutenir » : le serveur décide, puis l'écran suit sa réponse.</summary>
+    public async Task ToggleSupportAsync(Report report)
+    {
+        if (!int.TryParse(report.Id, out var id)) return;
+
+        try
+        {
+            var result = await CallAsync(() => _api.ToggleSupportAsync(id));
+            report.IsSupported = result.Supported;
+            report.SupportCount = result.SupportCount;
+        }
+        catch (ApiException ex)
+        {
+            // 401 : la session a expiré, l'application renvoie déjà vers la connexion.
+            if (ex.StatusCode != 401)
+            {
+                await ShowErrorAsync("Le soutien n'a pas été enregistré : " + ex.Message);
+            }
+        }
+    }
+
+    public async Task MarkAllNotificationsReadAsync()
+    {
+        try
+        {
+            await CallAsync(async () =>
+            {
+                await _api.MarkAllNotificationsReadAsync();
+                return true;
+            });
+        }
+        catch (ApiException ex)
+        {
+            Debug.WriteLine($"[API] Notifications non marquées comme lues : {ex.Message}");
+        }
+    }
+
+    public async Task<ProfileInfo?> GetProfileInfoAsync()
+    {
+        try
+        {
+            _profile = await CallAsync(() => _api.GetProfileAsync());
+            return new ProfileInfo(
+                _profile.ReportCount,
+                _profile.SupportsReceived,
+                _profile.ResolvedCount,
+                _profile.NotificationsEnabled,
+                _profile.Language);
+        }
+        catch (ApiException ex)
+        {
+            await HandleReadErrorAsync(ex);
+            return null;
+        }
+    }
+
+    public async Task SaveSettingsAsync(bool notificationsEnabled, string language)
+    {
+        try
+        {
+            // Le serveur veut aussi le nom et le quartier : on reprend ceux qu'il connaît déjà.
+            var current = _profile ?? await CallAsync(() => _api.GetProfileAsync());
+            _profile = await CallAsync(() => _api.UpdateProfileAsync(
+                current.FullName, current.Quartier, notificationsEnabled, language));
+        }
+        catch (ApiException ex)
+        {
+            Debug.WriteLine($"[API] Réglages non enregistrés : {ex.Message}");
         }
     }
 

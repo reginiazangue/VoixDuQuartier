@@ -39,9 +39,12 @@ public partial class NotificationsViewModel : BaseViewModel
         IsEmpty = Items.Count == 0;
     }
 
+    /// <summary>Marque tout comme lu à l'écran, puis l'enregistre sur le serveur
+    /// (sinon les notifications redeviendraient « non lues » au prochain chargement).</summary>
     [RelayCommand]
-    private void MarkAllRead()
+    private async Task MarkAllReadAsync()
     {
         foreach (var n in Items) n.IsRead = true;
+        await _data.MarkAllNotificationsReadAsync();
     }
 }

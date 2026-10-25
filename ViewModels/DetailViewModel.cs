@@ -45,20 +45,23 @@ public partial class DetailViewModel : BaseViewModel
         }
     }
 
+    /// <summary>
+    /// Le soutien est d'abord enregistré par le serveur. Le bouton et le compteur ne changent
+    /// qu'une fois la réponse reçue : si le serveur refuse, l'écran reste exact.
+    /// </summary>
     [RelayCommand]
-    private void ToggleSupport()
+    private async Task ToggleSupportAsync()
     {
-        if (Report is null) return;
+        if (Report is null || IsBusy) return; // IsBusy évite les doubles appuis
 
-        if (Report.IsSupported)
+        IsBusy = true;
+        try
         {
-            Report.IsSupported = false;
-            Report.SupportCount--;
+            await _data.ToggleSupportAsync(Report);
         }
-        else
+        finally
         {
-            Report.IsSupported = true;
-            Report.SupportCount++;
+            IsBusy = false;
         }
     }
 

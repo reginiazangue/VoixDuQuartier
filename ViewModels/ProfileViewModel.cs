@@ -12,6 +12,9 @@ public partial class ProfileViewModel : BaseViewModel
     private readonly ISessionService _session;
     private List<Report> _mine = new();
 
+    // Vrai pendant qu'on applique les réglages reçus du serveur : on ne les renvoie pas aussitôt au serveur.
+    private bool _applyingServerSettings;
+
     public ProfileViewModel(IDataService data, ISessionService session)
     {
         _data = data;
@@ -48,6 +51,7 @@ public partial class ProfileViewModel : BaseViewModel
         RefreshList();
     }
 
+    // Le mode sombre reste un réglage de l'appareil : il n'est pas envoyé au serveur.
     partial void OnDarkModeChanged(bool value)
     {
         Preferences.Default.Set("dark_mode", value);
@@ -56,11 +60,17 @@ public partial class ProfileViewModel : BaseViewModel
     }
 
     partial void OnNotificationsEnabledChanged(bool value)
-        => Preferences.Default.Set("notifications_enabled", value);
+    {
+        Preferences.Default.Set("notifications_enabled", value);
+        _ = SaveSettingsAsync();
+    }
 
     // La traduction complète de l'interface viendra avec les fichiers de ressources (.resx).
     partial void OnLanguageChanged(string value)
-        => Preferences.Default.Set("language", value);
+    {
+        Preferences.Default.Set("language", value);
+        _ = SaveSettingsAsync();
+    }
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -70,10 +80,34 @@ public partial class ProfileViewModel : BaseViewModel
         Neighborhood = user is null || string.IsNullOrEmpty(user.Neighborhood) ? string.Empty : $"Quartier : {user.Neighborhood}";
         Initial = user?.Initial ?? "?";
 
-        _mine = (await _data.GetReportsAsync()).Where(r => r.IsMine).ToList();
+        // Liste « Mes signalements » : demandée directement au serveur (uniquement les miens)
+        _mine = (await _data.GetMyReportsAsync()).ToList();
+
+        // Chiffres calculés ici, au cas où le serveur ne répondrait pas à la requête suivante
         ReportCount = _mine.Count;
         SupportCount = _mine.Sum(r => r.SupportCount);
         ResolvedCount = _mine.Count(r => r.Status == ReportStatus.Resolved);
+
+        // Chiffres officiels et réglages enregistrés sur le serveur
+        var info = await _data.GetProfileInfoAsync();
+        if (info is not null)
+        {
+            ReportCount = info.ReportCount;
+            SupportCount = info.SupportCount;
+            ResolvedCount = info.ResolvedCount;
+
+            _applyingServerSettings = true;
+            try
+            {
+                NotificationsEnabled = info.NotificationsEnabled;
+                Language = FromApiLanguage(info.Language);
+            }
+            finally
+            {
+                _applyingServerSettings = false;
+            }
+        }
+
         RefreshList();
     }
 
@@ -93,6 +127,25 @@ public partial class ProfileViewModel : BaseViewModel
         _session.Logout();
         await Shell.Current.GoToAsync("//login");
     }
+
+    private async Task SaveSettingsAsync()
+    {
+        if (_applyingServerSettings) return;
+
+        try
+        {
+            await _data.SaveSettingsAsync(NotificationsEnabled, ToApiLanguage(Language));
+        }
+        catch (Exception ex)
+        {
+            // Le réglage reste enregistré sur l'appareil ; on réessaiera au prochain changement.
+            System.Diagnostics.Debug.WriteLine($"[Profil] Réglages non envoyés : {ex.Message}");
+        }
+    }
+
+    private static string ToApiLanguage(string language) => language == "English" ? "en" : "fr";
+
+    private static string FromApiLanguage(string language) => language == "en" ? "English" : "Français";
 
     private void RefreshList()
     {
